@@ -2,19 +2,6 @@ const axios = require('axios');
 const launches = require('./launches.mongo');
 const planets = require('./planets.mongo');
 
-const launch = {
-    flightNumber: 100,
-    mission: 'Kepler Exploration X',
-    rocket: 'Explorer IS1',
-    destination: 'Kepler-442 b',
-    launchDate: 'January 4, 2030',
-    customer: ['ZTM', 'NASA'],
-    upcoming: true,
-    success: true,
-};
-
-saveLaunch(launch);
-
 async function loadHistoricalLaunchData() {
 
     const firstLaunch = await findLaunch({
@@ -92,11 +79,12 @@ async function existsLaunchWithId(launchId) {
     });
 }
 
-async function getAllLaunches() {
-    return await launches.find(
-        {},
-        { '_id': 0, '__v': 0 }
-    );
+async function getAllLaunches(offset, limit) {
+    return await launches
+        .find({}, { '_id': 0, '__v': 0 })
+        .sort({ flightNumber: 1 })
+        .skip(offset)
+        .limit(limit);
 }
 
 async function saveLaunch(launch) {

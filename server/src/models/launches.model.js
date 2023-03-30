@@ -1,3 +1,4 @@
+const axios = require('axios');
 const launches = require('./launches.mongo');
 const planets = require('./planets.mongo');
 
@@ -14,8 +15,79 @@ const launch = {
 
 saveLaunch(launch);
 
+async function loadHistoricalLaunchData() {
+
+    const firstLaunch = await findLaunch({
+        flightNumber: 1,
+        rocket: 'Falcon 1',
+        mission: 'FalconSat',
+    });
+
+    if(firstLaunch) {
+        console.log('Historical launch data already downloaded.');
+        return;
+    } else {
+        await downloadHistoricalLaunches();
+    }
+}
+
+async function downloadHistoricalLaunches() {
+    console.log('Loading historical launch data from SpaceXData API...');
+
+    const SpaceX_API_URL = 'https://api.spacexdata.com/v4/launches/query';
+
+    const response = await axios.post(SpaceX_API_URL, {
+        query: {},
+        options: {
+            pagination: false,
+            populate: [
+                {
+                    path: 'rocket',
+                    select: { name: 1 },
+                },
+                {
+                    path: 'payloads',
+                    select: { customers: 1 },
+                }
+            ]
+        },
+    });
+
+    if(response.status !== 200) {
+        console.log('Problem downloading launch data using SpaceX API.');
+        throw new Error('Historical launch data download failed.');
+    }
+
+    const launchDocs = response.data.docs;
+
+    for(const launchDoc of launchDocs) {
+        const payloads = launchDoc['payloads'];
+        const customers = payloads.flatMap((payload) => {
+            return payload['customers'];
+        });
+
+        const flightData = {
+            flightNumber: launchDoc['flight_number'],
+            mission: launchDoc['name'],
+            rocket: launchDoc['rocket']['name'],
+            launchDate: launchDoc['date_local'],
+            upcoming: launchDoc['upcoming'],
+            success: launchDoc['success'],
+            customers,
+        };
+
+        console.log(`${flightData.flightNumber} ${flightData.mission}`);
+
+        await saveLaunch(flightData);
+    }
+}
+
+async function findLaunch(filter) {
+    return await launches.findOne(filter);
+}
+
 async function existsLaunchWithId(launchId) {
-    return await launches.findOne({
+    return await findLaunch({
         flightNumber: launchId,
     });
 }
@@ -28,14 +100,6 @@ async function getAllLaunches() {
 }
 
 async function saveLaunch(launch) {
-    const planet = await planets.findOne({
-        keplerName: launch.destination,
-    });
-
-    if(!planet) {
-        throw new Error(`The planet '${launch.destination}' does not exist in our database.`);
-    }
-
     await launches.findOneAndUpdate(
         { flightNumber: launch.flightNumber },
         launch,
@@ -54,6 +118,13 @@ async function getLatestFlightNumber() {
 }
 
 async function scheduleNewLaunch(launch) {
+    const planet = await planets.findOne({
+        keplerName: launch.destination,
+    });
+
+    if(!planet) {
+        throw new Error(`The planet '${launch.destination}' does not exist in our database.`);
+    }
 
     const newLaunch = Object.assign(launch, {
         success: true,
@@ -76,6 +147,7 @@ async function abortLaunchById(launchId) {
 
 
 module.exports = {
+    loadHistoricalLaunchData,
     getAllLaunches,
     scheduleNewLaunch,
     existsLaunchWithId,

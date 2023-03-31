@@ -7,8 +7,8 @@ const apiV1 = require('./routes/api-v1');
 
 const app = express();
 
-app.use(cors({ 
-    origin: 'http://localhost:3000',
+app.use(cors({
+    origin: 'https://localhost:3000',
 }));
 
 app.use(morgan('combined'));

@@ -3,15 +3,33 @@ const cors = require('cors');
 const path = require('path');
 const morgan = require('morgan');
 const passport = require('passport');
+const cookieSession = require('cookie-session');
 
 const apiV1 = require('./routes/api-v1');
 const { GoogleAuthStrategy } = require('./services/oauth-google');
 
 passport.use(GoogleAuthStrategy());
 
+// Save the session in the cookie
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+// Retrieve the session from the cookie
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
+
 const app = express();
 
+app.use(cookieSession({
+    name: 'nasa-session',
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [process.env.COOKIE_KEY_1, process.env.COOKIE_KEY_2],
+}));
+
 app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors({
     origin: 'https://localhost:3000',

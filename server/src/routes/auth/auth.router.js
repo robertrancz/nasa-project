@@ -8,7 +8,7 @@ authRouter.get('/auth/google-login', passport.authenticate('google', { scope: ['
 authRouter.get('/auth/google/callback', passport.authenticate('google', {
     failureRedirect: '/login-failure',
     successRedirect: '/',
-    session: false,
+    session: true,
     }),
     (req, res) => {
         console.log('Google auth callback worked');

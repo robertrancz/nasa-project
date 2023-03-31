@@ -2,10 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const morgan = require('morgan');
+const passport = require('passport');
 
 const apiV1 = require('./routes/api-v1');
+const { GoogleAuthStrategy } = require('./services/oauth-google');
+
+passport.use(GoogleAuthStrategy());
 
 const app = express();
+
+app.use(passport.initialize());
 
 app.use(cors({
     origin: 'https://localhost:3000',

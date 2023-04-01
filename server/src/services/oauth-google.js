@@ -5,7 +5,7 @@ function GoogleAuthStrategy() {
 }
 
 const authOptions = {
-    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientID: process.env.GOOGLE_CLIENT_ID || 'test',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: '/v1/auth/google/callback',
 };

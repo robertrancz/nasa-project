@@ -1,10 +1,20 @@
 const request = require('supertest');
-const app = require('../../app');
+const sinon = require('sinon');
+var authMiddleware, app;
 const { mongoConnect, mongoDisconnect } = require('../../services/mongo');
 
 describe('Launches API tests', () => {
 
   beforeAll(async () => {
+    // Stub out the auth middleware so we can test the launches API
+    authMiddleware = require('../../middlewares/require-auth');
+    sinon.stub(authMiddleware, 'requireAuth')
+      .callsFake((req, res, next) => {
+        return next();
+      });
+
+    app = require('../../app');
+
     await mongoConnect();
   });
 

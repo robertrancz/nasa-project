@@ -95,6 +95,12 @@ const Header = props => {
             <i className="material-icons">history</i>History</Link>
           </Highlight>
         </Clickable>
+        <Clickable className={classes.clickable} onClick={onNav}>
+          <Highlight className={classes.button} animate layer="header">
+            <Link className={classes.link} to="/login">
+            <i className="material-icons">login</i>Login</Link>
+          </Highlight>
+        </Clickable>
       </nav>
     </Centered>
   </ArwesHeader>

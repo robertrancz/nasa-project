@@ -13,6 +13,7 @@ import {
 
 import usePlanets from "../hooks/usePlanets";
 import useLaunches from "../hooks/useLaunches";
+//import useLogin from "../hooks/useLogin";
 
 import Centered from "../components/Centered";
 import Header from "../components/Header";
@@ -21,6 +22,7 @@ import Footer from "../components/Footer";
 import Launch from "./Launch";
 import History from "./History";
 import Upcoming from "./Upcoming";
+import Login from "./Login";
 
 const styles = () => ({
   content: {
@@ -59,6 +61,7 @@ const AppLayout = props => {
   } = useLaunches(onSuccessSound, onAbortSound, onFailureSound);
 
   const planets = usePlanets();
+  //const login = useLogin();
   
   return <div className={classes.content}>
     <Header onNav={animateFrame} />
@@ -92,6 +95,11 @@ const AppLayout = props => {
             </Route>
             <Route exact path="/history">
               <History entered={anim.entered} launches={launches} />
+            </Route>
+            <Route exact path="/login">
+              <Login
+                entered={anim.entered}
+                /*login={login}*/ />
             </Route>
           </Switch>
           </div>

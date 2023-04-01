@@ -7,7 +7,7 @@ function GoogleAuthStrategy() {
 const authOptions = {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback',
+    callbackURL: '/v1/auth/google/callback',
 };
 
 const verifyCallback = (accessToken, refreshToken, profile, done) => {

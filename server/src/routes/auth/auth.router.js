@@ -15,7 +15,10 @@ authRouter.get('/auth/google/callback', passport.authenticate('google', {
     }
 );
 
-authRouter.get('/auth/logout', (req, res) => {});
+authRouter.get('/auth/logout', (req, res) => {
+    req.logout();   // Removes req.user and clears the login session
+    return res.redirect('/');
+});
 
 authRouter.get('/login-failure', (req, res) => {
     return res.status(401).json({ message: 'Login failed' });

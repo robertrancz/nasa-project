@@ -1,7 +1,8 @@
 const request = require('supertest');
 const sinon = require('sinon');
-var authMiddleware, app;
 const { mongoConnect, mongoDisconnect } = require('../../services/mongo');
+const { loadPlanetsData } = require('../../models/planets.model');
+var authMiddleware, app;
 
 describe('Launches API tests', () => {
 
@@ -16,6 +17,7 @@ describe('Launches API tests', () => {
     app = require('../../app');
 
     await mongoConnect();
+    await loadPlanetsData();
   });
 
   afterAll(async () => {
